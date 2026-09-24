@@ -1,0 +1,14 @@
+{
+  "Servers": {
+    "1": {
+      "Name": "ETL Incremental - PostgreSQL",
+      "Group": "Servers",
+      "Host": "postgres",
+      "Port": 5432,
+      "MaintenanceDB": "etl_incremental",
+      "Username": "admin",
+      "SSLMode": "prefer",
+      "PassFile": "/pgpass"
+    }
+  }
+}

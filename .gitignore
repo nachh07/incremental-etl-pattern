@@ -1,0 +1,19 @@
+# Environment files
+.env
+.env.local
+
+# Database dumps
+*.sql.backup
+*.dump
+
+# Logs
+*.log
+
+# Docker volumes
+pgdata/
+pgadmin_data/
+
+# IDE
+.vscode/
+.idea/
+*.swp
