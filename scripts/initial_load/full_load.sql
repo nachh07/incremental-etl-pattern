@@ -23,7 +23,10 @@ CREATE TABLE destino_products (
     created_at   TIMESTAMP,
     updated_at   TIMESTAMP,
     is_active    BOOLEAN DEFAULT TRUE,
-    inactive_at  TIMESTAMP
+    inactive_at  TIMESTAMP,
+    -- Columnas de hash para detección de cambios y lookup eficiente
+    pk_hash      TEXT,   -- MD5 de la clave primaria (product_id)
+    r_hash       TEXT    -- MD5 del resto de columnas de origen (detección de cambios)
 );
 
 INSERT INTO origen_products VALUES
@@ -54,22 +57,39 @@ INSERT INTO origen_products VALUES
 (25, 'Adobe Creative Cloud 1 mes', 54.99, '2025-01-25 11:00', '2025-01-25 11:00');
 
 INSERT INTO destino_products (
-    product_id, 
-    product_name, 
+    product_id,
+    product_name,
     price,
-    created_at, 
+    created_at,
     updated_at,
     is_active,
-    inactive_at
+    inactive_at,
+    pk_hash,
+    r_hash
 )
 SELECT
-    product_id, 
-    product_name, 
+    product_id,
+    product_name,
     price,
-    created_at, 
+    created_at,
     updated_at,
     TRUE,
-    NULL
+    NULL,
+    -- PK_HASH: hash de la clave primaria
+    MD5(product_id::TEXT),
+    -- R_HASH: hash de todos los atributos de origen (sin PK ni columnas de control ETL)
+    MD5(CONCAT_WS('|',
+        COALESCE(product_name, ''),
+        COALESCE(price::TEXT, ''),
+        COALESCE(created_at::TEXT, ''),
+        COALESCE(updated_at::TEXT, '')
+    ))
 FROM origen_products;
 
-SELECT * FROM destino_products ORDER BY product_id;
+SELECT
+    product_id,
+    product_name,
+    pk_hash,
+    r_hash
+FROM destino_products
+ORDER BY product_id;
